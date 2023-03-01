@@ -14,8 +14,8 @@ def predict(inputs, top_p, temperature, openai_api_key, history=[]):
     payload = {
     "model": "gpt-3.5-turbo",
     "messages": [{"role": "user", "content": f"{inputs}"}],
-    "temperature" : 1.0,
-    "top_p":1.0,
+    "temperature" : temperature, #1.0,
+    "top_p": top_p, #1.0,
     "n" : 1,
     "stream": True,
     "presence_penalty":0,
@@ -87,8 +87,8 @@ with gr.Blocks(css = """#col_container {width: 700px; margin-left: auto; margin-
     
         #inputs, top_p, temperature, top_k, repetition_penalty
         with gr.Accordion("Parameters", open=False):
-            top_p = gr.Slider( minimum=-0, maximum=1.0, value=0.95, step=0.05, interactive=True, label="Top-p (nucleus sampling)",)
-            temperature = gr.Slider( minimum=-0, maximum=5.0, value=0.5, step=0.1, interactive=True, label="Temperature",)
+            top_p = gr.Slider( minimum=-0, maximum=1.0, value=1.0, step=0.05, interactive=True, label="Top-p (nucleus sampling)",)
+            temperature = gr.Slider( minimum=-0, maximum=5.0, value=1.0, step=0.1, interactive=True, label="Temperature",)
             #top_k = gr.Slider( minimum=1, maximum=50, value=4, step=1, interactive=True, label="Top-k",)
             #repetition_penalty = gr.Slider( minimum=0.1, maximum=3.0, value=1.03, step=0.01, interactive=True, label="Repetition Penalty", )
     
