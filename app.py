@@ -6,16 +6,16 @@ import requests
 #Streaming endpoint
 API_URL = "https://api.openai.com/v1/chat/completions" #os.getenv("API_URL") + "/generate_stream"
 
-#Open AI Key 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") 
+#Testing with my Open AI Key 
+#OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") 
 
-def predict(inputs, top_p, temperature, openai_api_key, history=[]):  
+def predict(inputs, top_p, temperature, openai_api_key, chat_counter, chatbot=[], history=[]):  #repetition_penalty, top_k
 
     payload = {
     "model": "gpt-3.5-turbo",
     "messages": [{"role": "user", "content": f"{inputs}"}],
-    "temperature" : temperature, #1.0,
-    "top_p": top_p, #1.0,
+    "temperature" : 1.0,
+    "top_p":1.0,
     "n" : 1,
     "stream": True,
     "presence_penalty":0,
@@ -27,8 +27,38 @@ def predict(inputs, top_p, temperature, openai_api_key, history=[]):
     "Authorization": f"Bearer {openai_api_key}"
     }
 
-    
+    print(f"chat_counter - {chat_counter}")
+    if chat_counter != 0 :
+        messages=[]
+        for data in chatbot:
+          temp1 = {}
+          temp1["role"] = "user" 
+          temp1["content"] = data[0] 
+          temp2 = {}
+          temp2["role"] = "assistant" 
+          temp2["content"] = data[1]
+          messages.append(temp1)
+          messages.append(temp2)
+        temp3 = {}
+        temp3["role"] = "user" 
+        temp3["content"] = inputs
+        messages.append(temp3)
+        #messages
+        payload = {
+        "model": "gpt-3.5-turbo",
+        "messages": messages, #[{"role": "user", "content": f"{inputs}"}],
+        "temperature" : temperature, #1.0,
+        "top_p": top_p, #1.0,
+        "n" : 1,
+        "stream": True,
+        "presence_penalty":0,
+        "frequency_penalty":0,
+        }
+
+    chat_counter+=1
+
     history.append(inputs)
+    print(f"payload is - {payload}")
     # make a POST request to the API endpoint using the requests.post method, passing in stream=True
     response = requests.post(API_URL, headers=headers, json=payload, stream=True)
     #response = requests.post(API_URL, headers=headers, json=payload, stream=True)
@@ -54,8 +84,9 @@ def predict(inputs, top_p, temperature, openai_api_key, history=[]):
             history[-1] = partial_words
           chat = [(history[i], history[i + 1]) for i in range(0, len(history) - 1, 2) ]  # convert to tuples of list
           token_counter+=1
-          yield chat, history # resembles {chatbot: chat, state: history}  
+          yield chat, history, chat_counter  # resembles {chatbot: chat, state: history}  
         
+       
 
 def reset_textbox():
     return gr.update(value='')
@@ -69,14 +100,12 @@ User: <utterance>
 Assistant: <utterance>
 ...
 ```
-In this app, you can explore the outputs of a 20B large language model.
+In this app, you can explore the outputs of a gpt-3.5-turbo LLM.
 """
-#<a href="https://huggingface.co/spaces/ysharma/ChatGPTwithAPI?duplicate=true"><img src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>Duplicate Space with GPU Upgrade for fast Inference & no queue<br> 
                 
 with gr.Blocks(css = """#col_container {width: 700px; margin-left: auto; margin-right: auto;}
                 #chatbot {height: 400px; overflow: auto;}""") as demo:
     gr.HTML(title)
-    gr.HTML()
     gr.HTML('''<center><a href="https://huggingface.co/spaces/ysharma/ChatGPTwithAPI?duplicate=true"><img src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>Duplicate the Space and run securely with your OpenAI API Key</center>''')
     with gr.Column(elem_id = "col_container"):
         openai_api_key = gr.Textbox(type='password', label="Enter your OpenAI API key here")
@@ -91,10 +120,10 @@ with gr.Blocks(css = """#col_container {width: 700px; margin-left: auto; margin-
             temperature = gr.Slider( minimum=-0, maximum=5.0, value=1.0, step=0.1, interactive=True, label="Temperature",)
             #top_k = gr.Slider( minimum=1, maximum=50, value=4, step=1, interactive=True, label="Top-k",)
             #repetition_penalty = gr.Slider( minimum=0.1, maximum=3.0, value=1.03, step=0.01, interactive=True, label="Repetition Penalty", )
-    
+            chat_counter = gr.Number(value=0, visible=False, precision=0)
 
-    inputs.submit( predict, [inputs, top_p, temperature, openai_api_key, state], [chatbot, state],)
-    b1.click( predict, [inputs, top_p, temperature, openai_api_key, state], [chatbot, state],)
+    inputs.submit( predict, [inputs, top_p, temperature, openai_api_key, chat_counter, chatbot, state], [chatbot, state, chat_counter],)
+    b1.click( predict, [inputs, top_p, temperature, openai_api_key, chat_counter, chatbot, state], [chatbot, state, chat_counter],)
     b1.click(reset_textbox, [], [inputs])
     inputs.submit(reset_textbox, [], [inputs])
                     
