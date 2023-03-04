@@ -67,29 +67,25 @@ def predict(inputs, top_p, temperature, openai_api_key, chat_counter, chatbot=[]
 
     counter=0
     for chunk in response.iter_lines():
-        print(f"chunk.decode() is ^^ - {chunk.decode()}")
         if counter == 0:
           counter+=1
           continue
         counter+=1
         # check whether each line is non-empty
         if chunk :
-          chunk_str = chunk.decode()[6:]
-          if chunk_str:
-            delta = json.loads(chunk_str)['choices'][0]["delta"]
-            if len(delta) == 0:
-                break
-            # decode each line as response data is in bytes
-            partial_words = partial_words + json.loads(chunk.decode()[6:])['choices'][0]["delta"]["content"]
-            if token_counter == 0:
-              history.append(" " + partial_words)
-            else:
-              history[-1] = partial_words
-            chat = [(history[i], history[i + 1]) for i in range(0, len(history) - 1, 2) ]  # convert to tuples of list
-            token_counter+=1
-            yield chat, history, chat_counter  # resembles {chatbot: chat, state: history}  
-        
-       
+          # decode each line as response data is in bytes
+          if len(json.loads(chunk.decode()[6:])['choices'][0]["delta"]) == 0:
+            break
+          #print(json.loads(chunk.decode()[6:])['choices'][0]["delta"]["content"])
+          partial_words = partial_words + json.loads(chunk.decode()[6:])['choices'][0]["delta"]["content"]
+          if token_counter == 0:
+            history.append(" " + partial_words)
+          else:
+            history[-1] = partial_words
+          chat = [(history[i], history[i + 1]) for i in range(0, len(history) - 1, 2) ]  # convert to tuples of list
+          token_counter+=1
+          yield chat, history, chat_counter  # resembles {chatbot: chat, state: history}  
+                   
 
 def reset_textbox():
     return gr.update(value='')
