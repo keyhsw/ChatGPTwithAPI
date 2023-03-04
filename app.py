@@ -103,7 +103,7 @@ In this app, you can explore the outputs of a gpt-3.5-turbo LLM.
 """
                 
 with gr.Blocks(css = """#col_container {width: 1000px; margin-left: auto; margin-right: auto;}
-                #chatbot {height: 800px; overflow: auto;}""") as demo:
+                #chatbot {height: 600px; overflow: auto;}""") as demo:
     gr.HTML(title)
     gr.HTML('''<center><a href="https://huggingface.co/spaces/ysharma/ChatGPTwithAPI?duplicate=true"><img src="https://bit.ly/3gLdBN6" alt="Duplicate Space"></a>Duplicate the Space and run securely with your OpenAI API Key</center>''')
     with gr.Column(elem_id = "col_container"):
