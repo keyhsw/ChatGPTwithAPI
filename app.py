@@ -67,6 +67,7 @@ def predict(inputs, top_p, temperature, openai_api_key, chat_counter, chatbot=[]
 
     counter=0
     for chunk in response.iter_lines():
+        print(f"chunk.decode() is ^^ - {chunk.decode()}")
         if counter == 0:
           counter+=1
           continue
