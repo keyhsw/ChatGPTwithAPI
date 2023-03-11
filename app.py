@@ -3,7 +3,7 @@ import os
 import json 
 import requests
 
-#Streaming endpoint
+#Streaming endpoint 
 API_URL = "https://api.openai.com/v1/chat/completions" #os.getenv("API_URL") + "/generate_stream"
 
 #Testing with my Open AI Key 
