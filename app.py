@@ -79,7 +79,7 @@ def predict(inputs, top_p, temperature, openai_api_key, chat_counter, chatbot=[]
           if len(chunk) > 12 and "delta" in json.loads(chunk[6:])['choices'][0]:
               #if len(json.loads(chunk.decode()[6:])['choices'][0]["delta"]) == 0:
               #  break
-              partial_words = partial_words + json.loads(chunk.decode()[6:])['choices'][0]["delta"]["content"]
+              partial_words = partial_words + json.loads(chunk[6:])['choices'][0]["delta"]["content"]
               if token_counter == 0:
                 history.append(" " + partial_words)
               else:
