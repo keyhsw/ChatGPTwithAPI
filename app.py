@@ -67,12 +67,13 @@ def predict(inputs, top_p, temperature, openai_api_key, chat_counter, chatbot=[]
 
     counter=0
     for chunk in response.iter_lines():
+        #Skipping first chunk
         if counter == 0:
           counter+=1
           continue
-        counter+=1
+        #counter+=1
         # check whether each line is non-empty
-        if chunk :
+        if chunk.decode() :
           chunk = chunk.decode()
           # decode each line as response data is in bytes
           if len(chunk) > 6 and "delta" in json.loads(chunk[6:])['choices'][0]:
